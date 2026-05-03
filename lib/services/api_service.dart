@@ -6,7 +6,7 @@ import '../models/poll.dart';
 
 class ApiService {
   // Замініть на ваш IP адресу або домен сервера
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
+  static const String baseUrl = 'http://188.190.37.238:3000/api';
 
   // Авторизація
   Future<Map<String, dynamic>> login(String login, String password) async {
