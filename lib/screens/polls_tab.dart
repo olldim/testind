@@ -67,6 +67,12 @@ class _PollsTabState extends State<PollsTab> {
                   Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
                   const SizedBox(height: 16),
                   const Text('Помилка при завантаженні голосувань'),
+                  const SizedBox(height: 8),
+                  Text(
+                    snapshot.error.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.black54),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
@@ -134,125 +140,111 @@ class _PollsTabState extends State<PollsTab> {
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Питання
             Text(
               poll.question,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Варіанти відповідей
+            const SizedBox(height: 14),
             ...poll.options.map((option) {
               final hasUserVoted = option.userVoted;
               final percentage = option.percentage;
 
-              return Column(
-                children: [
-                  // Назва та відсоток
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          option.text,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      Text(
-                        '${percentage.toStringAsFixed(1)}%',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Прогрес бар
-                  GestureDetector(
-                    onTap: isActive && !hasUserVoted
-                        ? () => _vote(poll, option)
-                        : null,
-                    child: Container(
-                      height: 36,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey[200],
-                      ),
-                      child: Stack(
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Material(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.grey.shade100,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: isActive && !hasUserVoted ? () => _vote(poll, option) : null,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Фон прогресу
-                          Container(
-                            height: 36,
-                            width: (percentage / 100) *
-                                (MediaQuery.of(context).size.width - 64),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.blue[300],
-                            ),
-                          ),
-                          // Текст всередині
-                          Center(
-                            child: Text(
-                              '${option.votes} голосів',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                          // Галочка якщо користувач голосував
-                          if (hasUserVoted)
-                            Positioned(
-                              right: 12,
-                              top: 0,
-                              bottom: 0,
-                              child: Center(
-                                child: Icon(
-                                  Icons.check,
-                                  color: Colors.green[700],
-                                  size: 20,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  option.text,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: hasUserVoted ? FontWeight.w700 : FontWeight.w500,
+                                    color: hasUserVoted ? Colors.blue.shade900 : Colors.black87,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${percentage.toStringAsFixed(1)}%',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: LinearProgressIndicator(
+                              minHeight: 10,
+                              value: percentage / 100,
+                              backgroundColor: Colors.white,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade400),
                             ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${option.votes} голосів',
+                                style: const TextStyle(fontSize: 12, color: Colors.black54),
+                              ),
+                              if (hasUserVoted)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.shade50,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.check, size: 14, color: Colors.green.shade700),
+                                      const SizedBox(width: 4),
+                                      Text('Ваш вибір', style: TextStyle(fontSize: 12, color: Colors.green.shade700)),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                ],
+                ),
               );
-            }).toList(),
-
-            // Статус
+            }),
             if (!isActive)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'Завершено',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'Завершено',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ),
           ],

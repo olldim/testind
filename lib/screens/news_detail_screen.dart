@@ -41,6 +41,8 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
       appBar: AppBar(
         title: const Text('Новина'),
         centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
       body: FutureBuilder<News>(
         future: _newsFuture,
@@ -66,130 +68,125 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
 
           return SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Основні відомості
+                if (news.images.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.network(
+                          news.images.first,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         news.title,
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Text(
                         _formatDate(news.createdAt),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
                       Text(
                         news.content,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
+                        style: const TextStyle(fontSize: 16, height: 1.7),
                       ),
                     ],
                   ),
                 ),
-
-                // Посилання
-                if (news.links.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Посилання',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                if (news.links.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Wrap(
-                      spacing: 8,
-                      children: news.links
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Посилання', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: news.links
+                              .map(
+                                (link) => OutlinedButton.icon(
+                                  onPressed: () => _launchUrl(link.url),
+                                  icon: const Icon(Icons.link),
+                                  label: Text(link.title),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.blue.shade700,
+                                    side: BorderSide(color: Colors.blue.shade100),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                if (news.images.length > 1)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        height: 260,
+                        enableInfiniteScroll: false,
+                        enlargeCenterPage: true,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentImageIndex = index;
+                          });
+                        },
+                      ),
+                      items: news.images
                           .map(
-                            (link) => ElevatedButton.icon(
-                              onPressed: () => _launchUrl(link.url),
-                              icon: const Icon(Icons.link),
-                              label: Text(link.title),
+                            (imageUrl) => ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: Image.network(
+                                imageUrl,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           )
                           .toList(),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                ],
-
-                // Картинки
-                if (news.images.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Картинки',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      height: 300,
-                      enableInfiniteScroll: false,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentImageIndex = index;
-                        });
-                      },
-                    ),
-                    items: news.images
-                        .map(
-                          (imageUrl) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              image: DecorationImage(
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: 12),
+                if (news.images.length > 1)
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
                         news.images.length,
-                        (index) => Container(
-                          width: 8,
+                        (index) => AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: _currentImageIndex == index ? 14 : 8,
                           height: 8,
                           margin: const EdgeInsets.symmetric(horizontal: 4),
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: index == _currentImageIndex
-                                ? Colors.blue
-                                : Colors.grey[300],
+                            color: _currentImageIndex == index ? Colors.blue.shade700 : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                ],
+                const SizedBox(height: 24),
               ],
             ),
           );

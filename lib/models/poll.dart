@@ -1,3 +1,13 @@
+bool _parseBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is int) return value == 1;
+  if (value is String) {
+    final normalized = value.toLowerCase();
+    return normalized == '1' || normalized == 'true';
+  }
+  return false;
+}
+
 class Poll {
   final int id;
   final String question;
@@ -22,7 +32,7 @@ class Poll {
       options: (json['options'] as List)
           .map((opt) => PollOption.fromJson(opt as Map<String, dynamic>))
           .toList(),
-      isActive: json['is_active'] as bool,
+      isActive: _parseBool(json['is_active']),
       createdAt: DateTime.parse(json['created_at'] as String),
       endDate: json['end_date'] != null ? DateTime.parse(json['end_date'] as String) : null,
     );
@@ -52,7 +62,7 @@ class PollOption {
       text: json['text'] as String,
       votes: json['votes'] as int,
       totalVotes: json['total_votes'] as int,
-      userVoted: json['user_voted'] as bool? ?? false,
+      userVoted: _parseBool(json['user_voted']),
     );
   }
 }
