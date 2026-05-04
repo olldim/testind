@@ -25,6 +25,8 @@ class Poll {
     this.endDate,
   });
 
+  int get totalVotes => options.isNotEmpty ? options.first.totalVotes : 0;
+
   factory Poll.fromJson(Map<String, dynamic> json) {
     return Poll(
       id: json['id'] as int,

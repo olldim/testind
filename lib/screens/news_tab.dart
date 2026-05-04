@@ -72,26 +72,9 @@ class _NewsTabState extends State<NewsTab> {
               if (index == 0) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Новини',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Оновити'),
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black87,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    'Новини',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 );
               }

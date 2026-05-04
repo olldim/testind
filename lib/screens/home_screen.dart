@@ -58,10 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Коледж'),
         centerTitle: true,
-        elevation: 0,
+        elevation: 2,
+        shadowColor: Theme.of(context).colorScheme.shadow,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Вийти',
             onPressed: () {
               context.read<AuthProvider>().logout();
             },
@@ -72,19 +76,21 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _currentIndex,
         children: pages,
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: NavigationBar(
-          height: 72,
-          selectedIndex: _currentIndex,
-          onDestinationSelected: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: destinations,
-        ),
+      bottomNavigationBar: NavigationBar(
+        height: 72,
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
+        shadowColor: Theme.of(context).colorScheme.shadow,
+        elevation: 3,
+        indicatorColor: Theme.of(context).colorScheme.primaryContainer,
+        destinations: destinations,
       ),
     );
   }

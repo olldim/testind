@@ -70,20 +70,6 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (news.images.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(22),
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Image.network(
-                          news.images.first,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Column(
@@ -139,13 +125,13 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                       ],
                     ),
                   ),
-                if (news.images.length > 1)
+                if (news.images.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 24),
                     child: CarouselSlider(
                       options: CarouselOptions(
                         height: 260,
-                        enableInfiniteScroll: false,
+                        enableInfiniteScroll: news.images.length > 1,
                         enlargeCenterPage: true,
                         onPageChanged: (index, reason) {
                           setState(() {

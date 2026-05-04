@@ -242,9 +242,19 @@ class _PollsTabState extends State<PollsTab> {
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Завершено',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Завершено',
+                      style: TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Усього учасників: ${poll.totalVotes}',
+                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    ),
+                  ],
                 ),
               ),
           ],
