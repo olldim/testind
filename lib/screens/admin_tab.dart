@@ -232,6 +232,7 @@ class _AdminTabState extends State<AdminTab> {
     final descriptionController = TextEditingController(text: news?['description'] ?? '');
     final contentController = TextEditingController(text: news?['content'] ?? '');
     final imagesController = TextEditingController(text: _joinImageUrls(news?['images']));
+    final linksController = TextEditingController(text: _joinLinks(news?['links']));
 
     final isEdit = news != null;
     final token = context.read<AuthProvider>().token!;
@@ -287,6 +288,16 @@ class _AdminTabState extends State<AdminTab> {
                     ),
                     maxLines: 2,
                   ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: linksController,
+                    decoration: InputDecoration(
+                      labelText: 'Посилання (назва|URL, через кому)',
+                      helperText: 'Приклад: Далі|https://example.com, Додати|https://add.com',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    maxLines: 2,
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -300,6 +311,18 @@ class _AdminTabState extends State<AdminTab> {
                         onPressed: () async {
                           Navigator.pop(context);
                           final images = imagesController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+                          final links = linksController.text
+                              .split(',')
+                              .map((raw) {
+                                final parts = raw.split('|').map((e) => e.trim()).toList();
+                                if (parts.length == 2) {
+                                  return {'title': parts[0], 'url': parts[1]};
+                                }
+                                return null;
+                              })
+                              .whereType<Map<String, String>>()
+                              .toList();
+                          
                           if (isEdit) {
                             await _runAdminAction(
                               () => ApiService().updateNews(
@@ -310,6 +333,7 @@ class _AdminTabState extends State<AdminTab> {
                                   'description': descriptionController.text,
                                   'content': contentController.text,
                                   'images': images,
+                                  'links': links,
                                 },
                               ),
                               'Новину оновлено',
@@ -322,7 +346,7 @@ class _AdminTabState extends State<AdminTab> {
                                 descriptionController.text,
                                 contentController.text,
                                 images,
-                                [],
+                                links,
                               ),
                               'Новину створено',
                             );
